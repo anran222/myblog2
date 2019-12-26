@@ -1,0 +1,155 @@
+//顺序表的实现
+//1、接口
+package com.bit.impl;
+
+public interface ISequence {
+    //在pos位置插入data
+    boolean add(int pos,Object data);
+    //查找关键字key，找到返回key的下标，没有返回null
+    int search(Object key);
+    //查找是否包含关键字key是否在顺序表当中
+    boolean contains(Object key);
+    //得到pos得值
+    Object getPos(int pos);
+    //删除第一次得到的关键字key
+    Object rmove(Object key);
+    //得到顺序表的长度
+    int size();
+    //打印顺序表
+    void display();
+    //清空顺序表以防内存泄漏
+    void clear();
+}
+
+package com.bit.dao;
+
+import com.bit.impl.ISequence;
+
+import java.util.Arrays;
+
+public class SequenceImpl implements ISequence {
+
+    private Object[] elemDate;
+    private int usedSize;
+    public static final int DEFAULT_CPACITY = 10;
+
+    public SequenceImpl() {
+        this.usedSize = 0;
+        this.elemDate = new Object[DEFAULT_CPACITY];
+    }
+
+    //判断是否为满
+    private boolean isFull() {
+        return this.usedSize == this.elemDate.length;
+    }
+
+    @Override
+    public boolean add(int pos, Object data) {
+        //1、判断pos合法性，放入数据后是否会溢出
+        if (pos < 0 || pos > this.usedSize) {
+            return false;
+        }
+        if (isFull()) {
+            this.elemDate = Arrays.copyOf(this.elemDate, this.elemDate.length * 2);
+            //    return false;
+        }
+        //2、挪数据
+        for (int i = this.usedSize - 1; i >= pos; i--) {
+            this.elemDate[i + 1] = this.elemDate[i];
+        }
+        //3、放入数据，usdSized++
+        this.elemDate[pos] = data;
+        this.usedSize++;
+        return true;
+    }
+
+    private boolean isEmpty() {
+        return this.usedSize == 0;
+    }
+
+    @Override
+    public int search(Object key) {
+        if (key == null) {
+            throw new UnsupportedOperationException("不可以传入" + "null为参数");
+        }
+        for (int i = 0; i < this.usedSize; i++) {
+            if (this.elemDate[i].equals(key)) {
+                return i;
+            }
+        }
+            return -1;
+    }
+
+    @Override
+    public boolean contains(Object key) {
+        if (key == null) {
+            throw new UnsupportedOperationException("不可以传入" + "null为参数");
+        }
+        for (int i = 0; i < this.usedSize; i++) {
+            if (this.elemDate[i].equals(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public Object getPos(int pos) {
+        if (pos<0||pos>this.usedSize){
+            return null;
+        }
+        return this.elemDate[pos];
+    }
+
+    @Override
+    public Object rmove(Object key) {
+        int index=search(key);
+        if (index==-1){
+            return  null;
+        }
+        Object oldData=this.elemDate[index];
+        int i=0;
+        for ( i = index; i <this.usedSize-1 ; i++) {
+            this.elemDate[i]=this.elemDate[i+1];
+        }
+        this.elemDate[i+1]=null;
+        this.usedSize--;
+        return oldData;
+    }
+
+    @Override
+    public int size() {
+        return this.usedSize;
+    }
+
+    @Override
+    public void display() {
+        for (int i = 0; i <this.usedSize ; i++) {
+            System.out.println(this.elemDate[i]+" ");
+        }
+        System.out.println();
+    }
+
+    @Override
+    public void clear() {
+        for (int i = 0; i <this.usedSize ; i++) {
+            this.elemDate[i]=null;
+        }
+        this.usedSize=0;
+    }
+}
+
+package test;
+
+import com.bit.dao.SequenceImpl;
+
+public class TestMain {
+        public static void main(String[] args) {
+            SequenceImpl sequence=new SequenceImpl();
+            for (int i = 0; i <10 ; i++) {
+                sequence.add(i,i);
+            }
+            sequence.display();
+        }
+    }
+
